@@ -4,15 +4,10 @@ on:
 jobs:
   dire_bonjour:
     runs-on: ubuntu-22.04
-    container:
-      image: ghcr.io/dduportal/esgi-gitpod
-      options: --user=root
+    env:
+      IMAGE_NAME: "mynode:19"
     steps:
-      - name: Use checkout 
+      - name: Checkout repository code 
         uses: actions/checkout@v3
-      - name: Install node
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20.x'
-      - run: npm install
-      - run: npm run lint
+      - run: docker image build --tag={IMAGE_NAME} .
+      - run: docker container run "{IMAGE_NAME}" npm run lint
