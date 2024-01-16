@@ -7,7 +7,11 @@ jobs:
     env:
       IMAGE_NAME: "mynode:19"
     steps:
-      - name: Checkout repository code 
-        uses: actions/checkout@v3
-      - run: docker image build --tag="${IMAGE_NAME}" .
-      - run: docker container run "${IMAGE_NAME}" npm run lint
+    - uses: actions/checkout@v3
+    - uses: hadolint/hadolint-action@v3.1.0
+      with:
+        dockerfile: Dockerfile
+    - name: Checkout repository code 
+      uses: actions/checkout@v3
+    - run: docker image build --tag="${IMAGE_NAME}" .
+    - run: docker container run "${IMAGE_NAME}" npm run lint
