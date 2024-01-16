@@ -1,18 +1,34 @@
+# bonjour.yml
 name: Bonjour
 on:
   - push
   - pull_request
-jobs:
+jobs:   
   dire_bonjour:
     runs-on: ubuntu-22.04
     env:
       IMAGE_NAME: "mynode:19"
     steps:
-    - uses: actions/checkout@v3
-    - uses: hadolint/hadolint-action@v3.1.0
-      with:
-        dockerfile: Dockerfile
-    - name: Checkout repository code 
-      uses: actions/checkout@v3
-    - run: docker image build --tag="${IMAGE_NAME}" .
-    - run: docker container run "${IMAGE_NAME}" npm run lint
+      - uses: actions/checkout@v3 # Récupère le contenu du dépôt correspondant au commit du workflow en cours
+      - uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+      - run: docker image build --tag="${IMAGE_NAME}" ./
+      - run: docker container run --rm "${IMAGE_NAME}" npm run lint
+  build_push:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }} 
+
+      - name: Push if on `main`
+        uses: docker/build-push-action@v4
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          push: true
+          context: ./
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/sayhello:${{ github.ref_name }}
