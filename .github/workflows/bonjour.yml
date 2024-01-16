@@ -10,5 +10,4 @@ jobs:
       - name: Checkout repository code 
         uses: actions/checkout@v3
       - run: docker image build --tag="${IMAGE_NAME}" .
-      - run: echo "Hello World" >> index.js
-      - run: docker container run --rm --workdir="$(pwd)" --volume="$(pwd)":"$(pwd)" "${IMAGE_NAME}" npm run lint
+      - run: docker container run "${IMAGE_NAME}" npm run lint
